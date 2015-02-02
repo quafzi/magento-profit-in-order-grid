@@ -37,6 +37,6 @@ class Quafzi_ProfitInOrderGrid_Block_Renderer_Profit
         return '<span'
             . ($alertNegative ? ' style="color:red;" title="' . $helper->__('At least one product was gifted!') . '"' : '')
             . ($alertWrongData ? ' style="color:#aaa;" title="' . $helper->__('For at least one product it seems, that we do not know the real cost!') . '"' : '')
-            . '>' . $profit . '</span>';
+            . '>' . $helper->formatCurrency($profit) . '</span>';
     }
 }
