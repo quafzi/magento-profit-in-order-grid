@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Quafzi_ProfitInOrderGrid>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends></depends>
+        </Quafzi_ProfitInOrderGrid>
+    </modules>
+</config>

@@ -1,0 +1,15 @@
+{
+    "name": "quafzi/magento-profit-in-order-grid",
+    "license": "OSL-3.0",
+    "type": "magento-module",
+    "description": "Adds a profit column to your order grid",
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    },
+    "authors":[
+        {
+            "name":"Thomas Birke",
+            "email":"tbirke@netextreme.de"
+        }
+    ]
+}
