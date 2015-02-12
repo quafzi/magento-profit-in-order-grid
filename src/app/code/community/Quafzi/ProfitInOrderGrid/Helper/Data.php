@@ -22,33 +22,37 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
         $orderProfit->setContainsWrongData(false);
         $orderProfit->setCost(0);
         $orderProfit->setProfit(0);
-        $foo = [];
+        $rowNetPrices = array();
         foreach ($order->getAllItems() as $item) {
             $product = $item->getProduct();
             $qty = $item->getQtyOrdered();
             $rowCost = $product->getCost() * $qty;
-            $rowPrice = $item->getRowTotalInclTax() - $item->getDiscountAmount();
-            if ($rowPrice <= 0) {
+            $rowNetPrice = $item->getRowTotal() - $item->getDiscountAmount();
+            if (empty($rowPrice) && $item->getParentItemId()) {
+                $rowNetPrice = $rowNetPrices[$item->getParentItemId()];
+            } else {
+                $rowNetPrices[$item->getId()] = $rowNetPrice;
+            }
+            if ($rowNetPrice <= 0) {
                 continue;
             }
-            if (empty($rowCost) || 100*$rowCost/$rowPrice < 10) {
+            if (in_array($product->getTypeId(), array('configurable', 'grouped'))) {
+                continue;
+            }
+            if (in_array($product->getTypeId(), array('bundle'))) {
+                $orderProfit->setContainsWrongData(true);
+            }
+            if (empty($rowCost) || 100*$rowCost/$rowNetPrice < 10) {
                 // less than 10 percent cost => that's probably an error in data...
                 $orderProfit->setContainsWrongData(true);
-                $rowCost = $rowPrice;
-            } elseif ($rowPrice < $rowCost) {
+                $rowCost = $rowNetPrice;
+            } elseif ($rowNetPrice < $rowCost) {
                 $orderProfit->setContainsNegativeProfit(true);
             }
-            $rowProfit = $rowPrice - $rowCost;
-            $foo[] = [
-                'sku' => $product->getSku(),
-                'type' => $product->getTypeId(),
-                'price' => $rowPrice,
-                'cost' => $rowCost,
-                'profit' => $rowProfit
-            ];
+            $rowProfit = $rowNetPrice - $rowCost;
             $orderProfit->setCost($orderProfit->getCost() + $rowCost);
             $orderProfit->setProfit($orderProfit->getProfit() + $rowProfit);
-            $orderProfit->setIncome($orderProfit->getIncome() + $rowPrice);
+            $orderProfit->setIncome($orderProfit->getIncome() + $rowNetPrice);
         }
         return $orderProfit;
     }
