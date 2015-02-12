@@ -32,6 +32,14 @@
                     </quafzi_profitinordergrid_adminhtml_block_html_before>
                 </observers>
             </core_layout_block_create_after>
+            <core_block_abstract_to_html_after>
+                <observers>
+                    <quafzi_profitinordergrid_adminhtml_block_html_before>
+                        <class>quafzi_profitinordergrid/observer</class>
+                        <method>afterBlockToHtml</method>
+                    </quafzi_profitinordergrid_adminhtml_block_html_before>
+                </observers>
+            </core_block_abstract_to_html_after>
         </events>
         <translate>
             <modules>
