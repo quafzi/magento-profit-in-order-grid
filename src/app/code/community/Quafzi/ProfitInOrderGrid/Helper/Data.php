@@ -28,54 +28,63 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
         $this->_items[$order->getId()] = array();
         $rowNetPrices = array();
         foreach ($order->getAllItems() as $item) {
-            $product = $item->getProduct();
-            $qty = $item->getQtyOrdered();
-            $rowCost = $product->getCost() * $qty;
-            $rowNetPrice = $item->getRowTotal() - $item->getDiscountAmount();
-            if (empty($rowPrice) && $item->getParentItemId()) {
-                $rowNetPrice = $rowNetPrices[$item->getParentItemId()];
-                $this->_items[$order->getId()][$item->getId()] = $this->_items[$order->getId()][$item->getParentItemId()];
+            if ($item->getParentItemId()) {
+                $row = new Varien_Object();
+                $row->setCost($item->getProduct()->getCost() * $item->getQtyOrdered())
+                    ->setNetPrice($item->getRowTotal() - $item->getDiscountAmount());
+                if (false === isset($this->_items[$order->getId()][$item->getParentItemId()])) {
+                    $this->_items[$order->getId()][$item->getParentItemId()] = new Varien_Object($row->getData());
+                } else {
+                    $parentData = $this->_items[$order->getId()][$item->getParentItemId()];
+                    if (0 == $parentData->getCost()) {
+                        $parentData->setCost($row->getCost());
+                    }
+                    if (0 == $this->_items[$order->getId()][$item->getParentItemId()]->getNetPrice()) {
+                        $parentData->setNetPrice($row->getNetPrice());
+                    }
+                    $parentData->setProfit($parentData->getNetPrice() - $parentData->getCost());
+                }
+                continue;
+            }
+            if (false === isset($this->_items[$order->getId()][$item->getId()])) {
+                $this->_items[$order->getId()][$item->getId()] = new Varien_Object();
+                $row = new Varien_Object();
             } else {
-                $rowNetPrices[$item->getId()] = $rowNetPrice;
-                $this->_items[$order->getId()][$item->getId()] = new Varien_Object(array(
-                    'cost'      => $rowCost,
-                    'net_price' => $rowNetPrice,
-                ));
+                $row = $this->_items[$order->getId()][$item->getId()];
             }
-            if ($rowNetPrice <= 0) {
-                continue;
+            if (0 == $row->getCost()) {
+                $row->setCost($item->getProduct()->getCost() * $item->getQtyOrdered());
             }
-            if (in_array($product->getTypeId(), array('configurable', 'grouped'))) {
-                continue;
+            if (0 == $row->getNetPrice()) {
+                $row->setNetPrice($item->getRowTotal() - $item->getDiscountAmount());
             }
-            if (in_array($product->getTypeId(), array('bundle'))) {
-                $orderProfit->setContainsWrongData(true);
-            }
-            if (empty($rowCost) || 100*$rowCost/$rowNetPrice < 10) {
+            $row->setTypeId($item->getProduct()->getTypeId());
+            $this->_items[$order->getId()][$item->getId()] = $row;
+        }
+
+        foreach ($this->_items[$order->getId()] as $row) {
+            $row->setProfit($row->getNetPrice() - $row->getCost());
+            if (0 == $row->getCost() || 100*$row->getCost()/$row->getNetPrice() < 10) {
                 // less than 10 percent cost => that's probably an error in data...
                 $orderProfit->setContainsWrongData(true);
-                $rowCost = $rowNetPrice;
-            } elseif ($rowNetPrice < $rowCost) {
+
+                //$row->setCost($row->getNetPrice());
+            } elseif ($row->getNetPrice() < $row->getCost()) {
                 $orderProfit->setContainsNegativeProfit(true);
             }
-            $rowProfit = $rowNetPrice - $rowCost;
             $orderProfit
-                ->setCost($orderProfit->getCost() + $rowCost)
-                ->setProfit($orderProfit->getProfit() + $rowProfit)
-                ->setIncome($orderProfit->getIncome() + $rowNetPrice);
-            if (!isset($this->_items[$order->getId()][$item->getId()])) {
-                $this->_items[$order->getId()][$item->getId()] = new Varien_Object();
-            }
-            $this->_items[$order->getId()][$item->getId()]
-                ->setCost($rowCost)
-                ->setNetPrice($rowNetPrice)
-                ->setProfit($rowProfit);
+                ->setCost($orderProfit->getCost() + $row->getCost())
+                ->setProfit($orderProfit->getProfit() + $row->getProfit())
+                ->setIncome($orderProfit->getIncome() + $row->getNetPrice());
         }
         return $orderProfit;
     }
 
     public function getItemProfit(Mage_Sales_Model_Order_Item $item)
     {
+        if ($item->getParentItemId()) {
+            return '';
+        }
         if (empty($this->_items)) {
             $this->getProfit($item->getOrder());
         }

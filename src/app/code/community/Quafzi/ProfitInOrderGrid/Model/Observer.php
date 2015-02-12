@@ -44,13 +44,13 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
     {
         $html = $transport->getHtml();
         $profit = Mage::helper('quafzi_profitinordergrid')->getItemProfit($item);
-        $transport->setHtml(
-            str_replace(
-                '<td class="a-right last">',
-                '<td class="a-right">' . $profit . '</td><td class="a-right last">',
-                $html
-            )
+        $html = str_replace(
+            '<td class="a-right last">',
+            '<td class="a-right"><!-- profit --></td><td class="a-right last">',
+            $html
         );
+        $transport->setHtml(preg_replace('/<!-- profit -->/', $profit, $html, 1));
+        $this->_renderedItems[] = $item->getId();
     }
 
     protected function _modifyGrid(Mage_Adminhtml_Block_Widget_Grid $grid, $after='grand_total')
