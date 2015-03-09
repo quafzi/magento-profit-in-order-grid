@@ -36,7 +36,9 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
                     $this->_items[$order->getId()][$item->getParentItemId()] = new Varien_Object($row->getData());
                 } else {
                     $parentData = $this->_items[$order->getId()][$item->getParentItemId()];
-                    if (0 == $parentData->getCost()) {
+                    if ('bundle' == $parentData->getTypeId()) {
+                        $parentData->setCost($parentData->getCost() + $row->getCost());
+                    } elseif (0 == $parentData->getCost()) {
                         $parentData->setCost($row->getCost());
                     }
                     if (0 == $this->_items[$order->getId()][$item->getParentItemId()]->getNetPrice()) {
@@ -46,15 +48,17 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
                 }
                 continue;
             }
+
             if (false === isset($this->_items[$order->getId()][$item->getId()])) {
-                $this->_items[$order->getId()][$item->getId()] = new Varien_Object();
                 $row = new Varien_Object();
             } else {
                 $row = $this->_items[$order->getId()][$item->getId()];
             }
+
             if (0 == $row->getCost()) {
                 $row->setCost($item->getProduct()->getCost() * $item->getQtyOrdered());
             }
+
             if (0 == $row->getNetPrice()) {
                 $row->setNetPrice($item->getRowTotal() - $item->getDiscountAmount());
             }
