@@ -68,7 +68,10 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
 
         foreach ($this->_items[$order->getId()] as $row) {
             $row->setProfit($row->getNetPrice() - $row->getCost());
-            if (0 == $row->getCost() || 100*$row->getCost()/$row->getNetPrice() < 10) {
+            if (0 == $row->getNetPrice()
+                || 0 == $row->getCost()
+                || 100*$row->getCost()/$row->getNetPrice() < 10
+            ) {
                 // less than 10 percent cost => that's probably an error in data...
                 $orderProfit->setContainsWrongData(true);
 
