@@ -13,8 +13,8 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
 
     /**
      * get profit of an order
-     * 
-     * @param Mage_Sales_Model_Order|Varien_Object $order 
+     *
+     * @param Mage_Sales_Model_Order|Varien_Object $order
      * @return Varien_Object
      */
     public function getProfit(Varien_Object $order)
@@ -56,9 +56,10 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
                 $row = $this->_items[$order->getId()][$item->getId()];
             }
 
-            $product = Mage::getModel('catalog/product')->loadByAttribute('sku', $item->getSku());
             if (0 == $row->getCost()) {
-                $row->setCost($product->getCost() * $item->getQtyOrdered());
+                $row->setCost(Mage::getResourceModel('catalog/product')->getAttributeRawValue(
+                    $item->getProductId(), 'cost', $order->getStore()
+                ) * $item->getQtyOrdered());
             }
 
             if (0 == $row->getNetPrice()) {
