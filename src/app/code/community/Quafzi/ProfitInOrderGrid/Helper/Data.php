@@ -28,7 +28,9 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
         $this->_items[$order->getId()] = array();
         $rowNetPrices = array();
         foreach ($order->getAllItems() as $item) {
+            /** @var $item Mage_Sales_Model_Order_Item */
             if ($item->getParentItemId()) {
+                // correct qty is given for parent item, child item may contain strange qtys
                 $row = new Varien_Object();
                 $row->setCost($item->getProduct()->getCost() * $item->getQtyOrdered())
                     ->setNetPrice($item->getRowTotal() - $item->getDiscountAmount());
@@ -38,8 +40,6 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
                     $parentData = $this->_items[$order->getId()][$item->getParentItemId()];
                     if ('bundle' == $parentData->getTypeId()) {
                         $parentData->setCost($parentData->getCost() + $row->getCost());
-                    } elseif (0 == $parentData->getCost()) {
-                        $parentData->setCost($row->getCost());
                     }
                     if (0 == $this->_items[$order->getId()][$item->getParentItemId()]->getNetPrice()) {
                         $parentData->setNetPrice($row->getNetPrice());
@@ -50,13 +50,15 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
             }
 
             if (false === isset($this->_items[$order->getId()][$item->getId()])) {
+                $this->_items[$order->getId()][$item->getId()] = new Varien_Object();
                 $row = new Varien_Object();
             } else {
                 $row = $this->_items[$order->getId()][$item->getId()];
             }
 
+            $product = Mage::getModel('catalog/product')->loadByAttribute('sku', $item->getSku());
             if (0 == $row->getCost()) {
-                $row->setCost($item->getProduct()->getCost() * $item->getQtyOrdered());
+                $row->setCost($product->getCost() * $item->getQtyOrdered());
             }
 
             if (0 == $row->getNetPrice()) {
