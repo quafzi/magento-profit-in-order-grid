@@ -30,43 +30,10 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
         foreach ($order->getAllItems() as $item) {
             /** @var $item Mage_Sales_Model_Order_Item */
             if ($item->getParentItemId()) {
-                // correct qty is given for parent item, child item may contain strange qtys
-                $row = new Varien_Object();
-                $row->setCost($item->getProduct()->getCost() * $item->getQtyOrdered())
-                    ->setNetPrice($item->getRowTotal() - $item->getDiscountAmount());
-                if (false === isset($this->_items[$order->getId()][$item->getParentItemId()])) {
-                    $this->_items[$order->getId()][$item->getParentItemId()] = new Varien_Object($row->getData());
-                } else {
-                    $parentData = $this->_items[$order->getId()][$item->getParentItemId()];
-                    if ('bundle' == $parentData->getTypeId()) {
-                        $parentData->setCost($parentData->getCost() + $row->getCost());
-                    }
-                    if (0 == $this->_items[$order->getId()][$item->getParentItemId()]->getNetPrice()) {
-                        $parentData->setNetPrice($row->getNetPrice());
-                    }
-                    $parentData->setProfit($parentData->getNetPrice() - $parentData->getCost());
-                }
-                continue;
-            }
-
-            if (false === isset($this->_items[$order->getId()][$item->getId()])) {
-                $this->_items[$order->getId()][$item->getId()] = new Varien_Object();
-                $row = new Varien_Object();
+                $this->_handleChildItem($item, $order);
             } else {
-                $row = $this->_items[$order->getId()][$item->getId()];
+                $this->_handleParentItem($item, $order);
             }
-
-            if (0 == $row->getCost()) {
-                $row->setCost(Mage::getResourceModel('catalog/product')->getAttributeRawValue(
-                    $item->getProductId(), 'cost', $order->getStore()
-                ) * $item->getQtyOrdered());
-            }
-
-            if (0 == $row->getNetPrice()) {
-                $row->setNetPrice($item->getRowTotal() - $item->getDiscountAmount());
-            }
-            $row->setTypeId($item->getProduct()->getTypeId());
-            $this->_items[$order->getId()][$item->getId()] = $row;
         }
 
         foreach ($this->_items[$order->getId()] as $row) {
@@ -88,6 +55,35 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
                 ->setIncome($orderProfit->getIncome() + $row->getNetPrice());
         }
         return $orderProfit;
+    }
+
+    protected function _handleChildItem ($item, $order) {
+        if (false === isset($this->_items[$order->getId()][$item->getParentItemId()])) {
+            $this->_items[$order->getId()][$item->getParentItemId()] = new Varien_Object();
+        }
+        $row = $this->_items[$order->getId()][$item->getParentItemId()];
+
+        // be careful: correct qty is given for parent item, child item may contain strange qtys
+        $cost = $row->getCost() ?: $item->getProduct()->getCost();
+        $qtyOrdered = $row->getQtyOrdered() ?: $item->getQtyOrdered();
+        $netPrice = $row->getNetPrice() ?: $item->getRowTotal() - $item->getDiscountAmount();
+
+        $row->setTotalCost($cost * $qtyOrdered);
+        $row->setCost($cost * $qtyOrdered)
+            ->setNetPrice($netPrice)
+            ->setProfit($netPrice - $row->getTotalCost());
+    }
+
+    protected function _handleParentItem ($item, $order) {
+        if (false === isset($this->_items[$order->getId()][$item->getId()])) {
+            $this->_items[$order->getId()][$item->getId()] = new Varien_Object();
+        }
+        $row = $this->_items[$order->getId()][$item->getId()];
+        $row->setCost($item->getProduct()->getCost());
+        $row->setQtyOrdered($item->getQtyOrdered());
+        $row->setTypeId($item->getProduct()->getTypeId());
+        $row->setNetPrice($item->getRowTotal() - $item->getDiscountAmount());
+        $row->setProfit($row->getNetPrice() - $row->getTotalCost());
     }
 
     public function getItemProfit(Mage_Sales_Model_Order_Item $item)
