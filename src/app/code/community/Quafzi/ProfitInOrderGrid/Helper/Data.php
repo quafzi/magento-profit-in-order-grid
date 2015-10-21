@@ -37,20 +37,20 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
         }
 
         foreach ($this->_items[$order->getId()] as $row) {
-            $row->setProfit($row->getNetPrice() - $row->getCost());
+            $row->setProfit($row->getNetPrice() - $row->getTotalCost());
             if (0 == $row->getNetPrice()
-                || 0 == $row->getCost()
-                || 100*$row->getCost()/$row->getNetPrice() < 10
+                || 0 == $row->getTotalCost()
+                || 100*$row->getTotalCost()/$row->getNetPrice() < 10
             ) {
                 // less than 10 percent cost => that's probably an error in data...
                 $orderProfit->setContainsWrongData(true);
 
                 //$row->setCost($row->getNetPrice());
-            } elseif ($row->getNetPrice() < $row->getCost()) {
+            } elseif ($row->getNetPrice() < $row->getTotalCost()) {
                 $orderProfit->setContainsNegativeProfit(true);
             }
             $orderProfit
-                ->setCost($orderProfit->getCost() + $row->getCost())
+                ->setCost($orderProfit->getCost() + $row->getTotalCost())
                 ->setProfit($orderProfit->getProfit() + $row->getProfit())
                 ->setIncome($orderProfit->getIncome() + $row->getNetPrice());
         }
@@ -68,8 +68,13 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
         $qtyOrdered = $row->getQtyOrdered() ?: $item->getQtyOrdered();
         $netPrice = $row->getNetPrice() ?: $item->getRowTotal() - $item->getDiscountAmount();
 
-        $row->setTotalCost($cost * $qtyOrdered);
-        $row->setCost($cost * $qtyOrdered)
+        if ('bundle' == $row->getTypeId()) {
+            $cost = $item->getProduct()->getCost();
+            $row->setTotalCost($row->getTotalCost() + $cost * $qtyOrdered);
+        } else {
+            $row->setTotalCost($cost * $qtyOrdered);
+        }
+        $row->setCost($cost)
             ->setNetPrice($netPrice)
             ->setProfit($netPrice - $row->getTotalCost());
     }
@@ -79,9 +84,14 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
             $this->_items[$order->getId()][$item->getId()] = new Varien_Object();
         }
         $row = $this->_items[$order->getId()][$item->getId()];
-        $row->setCost($item->getProduct()->getCost());
         $row->setQtyOrdered($item->getQtyOrdered());
         $row->setTypeId($item->getProduct()->getTypeId());
+        if (false === in_array($row->getTypeId(), Mage_Catalog_Model_Product_Type::getCompositeTypes())) {
+            /* there is no child item */
+            $cost = $item->getProduct()->getCost();
+            $row->setCost($cost);
+            $row->setTotalCost($cost * $row->getQtyOrdered());
+        }
         $row->setNetPrice($item->getRowTotal() - $item->getDiscountAmount());
         $row->setProfit($row->getNetPrice() - $row->getTotalCost());
     }
@@ -100,7 +110,7 @@ class Quafzi_ProfitInOrderGrid_Helper_Data
         $row = $this->_items[$item->getOrderId()][$item->getId()];
 
         $subTotals = array(
-            $this->__('Net Cost')  => $row->getCost(),
+            $this->__('Net Cost')  => $row->getTotalCost(),
             $this->__('Net Price') => $row->getNetPrice(),
         );
         $out = '<table class="qty-table" cellspacing="0">';
