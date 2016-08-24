@@ -1,6 +1,8 @@
 Quafzi ProfitInOrderGrid Extension
 ==================================
 
+[![Build Status](https://travis-ci.org/quafzi/magento-profit-in-order-grid.png)](https://travis-ci.org/quafzi/magento-profit-in-order-grid)
+
 This extension shows your profit in order grid.
 
 Facts
