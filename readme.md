@@ -1,10 +1,11 @@
 Quafzi ProfitInOrderGrid Extension
-=====================
+==================================
+
 This extension shows your profit in order grid.
 
 Facts
 -----
-- version: 1.0.0
+- version: see ``config.xml``
 - [extension on GitHub](https://github.com/quafzi/magento-profit-in-order-grid)
 - Composer package name: quafzi/magento-profit-in-order-grid
 
@@ -50,4 +51,5 @@ Licence
 
 Copyright
 ---------
-(c) 2015 Thomas Birke
+(c) 2015-2016 Thomas Birke
+

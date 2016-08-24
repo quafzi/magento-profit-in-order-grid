@@ -3,10 +3,10 @@
     "license": "OSL-3.0",
     "type": "magento-module",
     "description": "Adds a profit column to your order grid",
-    "require": {
+    "suggest": {
         "magento-hackathon/magento-composer-installer": "*"
     },
-    "authors":[
+    "authors": [
         {
             "name":"Thomas Birke",
             "email":"tbirke@netextreme.de"

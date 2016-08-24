@@ -1,22 +1,94 @@
 <?php
 /**
- * @package    Quafzi_ProfitInOrderGrid
- * @copyright  Copyright (c) 2015 Thomas Birke
- * @author     Thomas Birke <tbirke@netextreme.de>
- * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * Observer
+ *
+ * PHP version ^5.6
+ *
+ * @category  Mage_Sales
+ * @package   Quafzi_ProfitInOrderGrid
+ * @author    Thomas Birke <magento@netextreme.de>
+ * @copyright 2015-2016 Thomas Birke
+ * @license   http://opensource.org/licenses/osl-3.0.php OSL 3.0
+ * @link      https://github.com/quafzi/magento-profit-in-order-grid
  */
 
+/**
+ * Quafzi_ProfitInOrderGrid_Model_Observer
+ *
+ * @category Mage_Sales
+ * @package  Quafzi_ProfitInOrderGrid
+ * @author   Thomas Birke <magento@netextreme.de>
+ * @license  http://opensource.org/licenses/osl-3.0.php OSL 3.0
+ * @link     https://github.com/quafzi/magento-profit-in-order-grid
+ */
 class Quafzi_ProfitInOrderGrid_Model_Observer
 {
-    public function beforeBlockToHtml(Varien_Event_Observer $observer) {
+    /**
+     * If item has no cost, we need to add it based on product cost
+     * Update item profit
+     *
+     * @param Varien_Event_Observer $observer Observer
+     *
+     * @return void
+     */
+    public function updateOrderItemCostAndProfit(Varien_Event_Observer $observer)
+    {
+        $item = $observer->getEvent()->getModel();
+        if (!$item->getCost()) {
+            $item->setCost($item->getProduct()->getCost());
+        }
+        $item->setProfitAmount(
+            Mage::helper('quafzi_profitinordergrid/order_item')->getProfit($item)
+        );
+    }
+
+    /**
+     * Update cost and profit based on ordered items
+     *
+     * @param Varien_Event_Observer $observer Observer
+     *
+     * @return void
+     */
+    public function updateOrderCostAndProfit(Varien_Event_Observer $observer)
+    {
+        $order = $observer->getEvent()->getModel();
+        $helper = Mage::helper('quafzi_profitinordergrid');
+        $cost = 0;
+        $profit = 0;
+        foreach ($order->getItemsCollection() as $item) {
+            $cost += $item->getCost() * $item->getQtyOrdered();
+            $profit += $item->getCost() * $item->getQtyOrdered();
+        }
+
+    }
+
+    /**
+     * Add cost and profit to order grid
+     *
+     * @param Varien_Event_Observer $observer Observer
+     *
+     * @return void
+     */
+    public function beforeBlockToHtml(Varien_Event_Observer $observer)
+    {
         $block = $observer->getEvent()->getBlock();
         if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid) {
             $after = 'grand_total';
-            $this->_modifyGrid($block, $after);
+            $this->_addColumns($block, $after);
+            // reinitialize column order
+            $block->sortColumnsByOrder();
         }
     }
 
-    public function afterBlockToHtml(Varien_Event_Observer $observer) {
+    /**
+     * Inject cost and profit into order items in adminhtml order detail view
+     *
+     * @param Varien_Event_Observer $observer Observer
+     *
+     * @return void
+     */
+    public function afterBlockToHtml(Varien_Event_Observer $observer)
+    {
         $block = $observer->getEvent()->getBlock();
         if ($block instanceof Mage_Adminhtml_Block_Sales_Order_View_Items_Renderer_Default) {
             $item = $block->getItem();
@@ -27,6 +99,13 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
         }
     }
 
+    /**
+     * Inject column headers into order items in adminhtml order detail view
+     *
+     * @param Varien_Object $transport Transport
+     *
+     * @return void
+     */
     protected function _insertItemGridProfitColumnHeader($transport)
     {
         $html = $transport->getHtml();
@@ -40,6 +119,15 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
             )
         );
     }
+
+    /**
+     * Inject cost and profit data into order items in adminhtml order detail view
+     *
+     * @param Varien_Object               $transport Transport
+     * @param Mage_Sales_Model_Order_Item $item      Order item
+     *
+     * @return void
+     */
     protected function _insertItemGridProfitColumn($transport, $item)
     {
         $html = $transport->getHtml();
@@ -53,22 +141,26 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
         $this->_renderedItems[] = $item->getId();
     }
 
-    protected function _modifyGrid(Mage_Adminhtml_Block_Widget_Grid $grid, $after='grand_total')
+    /**
+     * Add column to order grid
+     *
+     * @param Mage_Adminhtml_Block_Sales_Order_Grid $grid  Grid
+     * @param string                                $after Preceding column name
+     *
+     * @return void
+     */
+    protected function _addColumns($grid, $after='grand_total')
     {
-        $this->_addProfitColumn($grid, $after);
-        // reinitialize column order
-        $grid->sortColumnsByOrder();
-    }
-
-    protected function _addProfitColumn($grid, $after='grand_total')
-    {
-        $grid->addColumnAfter('profit', array(
-            'header'    => Mage::helper('quafzi_profitinordergrid')->__('Profit'),
-            'align'     => 'right',
-            'width'     => '80px',
-            'filter'    => false,
-            'index'     => 'cost',
-            'renderer'  => 'quafzi_profitinordergrid/renderer_profit'
-        ), $after);
+        $columns = ['cost', 'profit_amount'];
+        $helper = Mage::helper('quafzi_profitinordergrid');
+        foreach ($columns as $column) {
+            $columnData = [
+                'header'    => $helper->__($column),
+                'align'     => 'right',
+                'width'     => '80px',
+                'index'     => $column
+            ];
+            $grid->addColumnAfter($column, $columnData, $after);
+        }
     }
 }
