@@ -60,12 +60,13 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
 
         $this->assertEquals(array_sum($costs), $helper->getCost($order));
     }
+
     /**
-     * Test profit calculation for simple products
+     * Test profit amount calculation for simple products
      *
      * @return void
      */
-    public function testGetProfitOfOrder()
+    public function testGetProfitAmountOfOrder()
     {
         $helper = new Quafzi_ProfitInOrderGrid_Helper_Order();
 

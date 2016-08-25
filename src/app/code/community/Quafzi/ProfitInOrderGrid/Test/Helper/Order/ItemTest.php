@@ -27,11 +27,11 @@ require_once dirname(__FILE__) . '/../../../Helper/Order/Item.php';
 class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
 {
     /**
-     * Test profit calculation for simple products
+     * Test profit amount calculation for simple products
      *
      * @return void
      */
-    public function testGetProfitOfSimpleProductItem()
+    public function testGetProfitAmountOfSimpleProductItem()
     {
         $helper = new Quafzi_ProfitInOrderGrid_Helper_Order_Item();
 
@@ -53,6 +53,9 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
             ->method('getQtyOrdered')
             ->will($this->returnValue(2));
 
-        $this->assertEquals(2 * (19.99 - 14.83) - 1.00, $helper->getProfit($item));
+        $this->assertEquals(
+            2 * (19.99 - 14.83) - 1.00,
+            $helper->getProfitAmount($item)
+        );
     }
 }

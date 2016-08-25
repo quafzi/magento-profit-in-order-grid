@@ -24,13 +24,13 @@
 class Quafzi_ProfitInOrderGrid_Helper_Order_Item
 {
     /**
-     * Get profit for an order item
+     * Get profit amount for an order item
      *
      * @param Mage_Sales_Model_Order_Item $item Order item
      *
      * @return float
      */
-    public function getProfit(Mage_Sales_Model_Order_Item $item)
+    public function getProfitAmount(Mage_Sales_Model_Order_Item $item)
     {
         return $item->getQtyOrdered() * ($item->getPrice() - $item->getCost())
             - $item->getDiscountAmount();

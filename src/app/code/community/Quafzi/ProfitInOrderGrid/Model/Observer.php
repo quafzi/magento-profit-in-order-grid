@@ -38,7 +38,7 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
             $item->setCost($item->getProduct()->getCost());
         }
         $item->setProfitAmount(
-            Mage::helper('quafzi_profitinordergrid/order_item')->getProfit($item)
+            Mage::helper('quafzi_profitinordergrid/order_item')->getProfitAmount($item)
         );
     }
 
