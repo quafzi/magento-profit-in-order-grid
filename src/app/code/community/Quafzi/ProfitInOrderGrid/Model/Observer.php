@@ -38,7 +38,8 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
             $item->setCost($item->getProduct()->getCost());
         }
         $helper = Mage::helper('quafzi_profitinordergrid/order_item');
-        $item->setProfitAmount($helper->getProfitAmount($item))
+        $item->setCost($helper->getCost($item))
+            ->setProfitAmount($helper->getProfitAmount($item))
             ->setProfitPercent($helper->getProfitPercentage($item));
     }
 
@@ -56,24 +57,6 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
         $order->setCost($helper->getCost($order))
             ->setProfitAmount($helper->getProfitAmount($order))
             ->setProfitPercent($helper->getProfitPercentage($order));
-    }
-
-    /**
-     * Add cost and profit to order grid
-     *
-     * @param Varien_Event_Observer $observer Observer
-     *
-     * @return void
-     */
-    public function beforeBlockToHtml(Varien_Event_Observer $observer)
-    {
-        $block = $observer->getEvent()->getBlock();
-        if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid) {
-            $after = 'grand_total';
-            $this->_addColumns($block, $after);
-            // reinitialize column order
-            $block->sortColumnsByOrder();
-        }
     }
 
     /**
@@ -135,28 +118,5 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
         );
         $transport->setHtml(preg_replace('/<!-- profit -->/', $profit, $html, 1));
         $this->_renderedItems[] = $item->getId();
-    }
-
-    /**
-     * Add column to order grid
-     *
-     * @param Mage_Adminhtml_Block_Sales_Order_Grid $grid  Grid
-     * @param string                                $after Preceding column name
-     *
-     * @return void
-     */
-    protected function _addColumns($grid, $after='grand_total')
-    {
-        $columns = ['cost', 'profit_amount', 'profit_percent'];
-        $helper = Mage::helper('quafzi_profitinordergrid');
-        foreach ($columns as $column) {
-            $columnData = [
-                'header'    => $helper->__($column),
-                'align'     => 'right',
-                'width'     => '80px',
-                'index'     => $column
-            ];
-            $grid->addColumnAfter($column, $columnData, $after);
-        }
     }
 }

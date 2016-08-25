@@ -71,7 +71,7 @@ class Quafzi_ProfitInOrderGrid_Helper_Order
         ) {
             $this->collectCostAndProfit($order);
         }
-        return $this->getProfitAmount($order) / $this->finalPrices[$order->getId()];
+        return $this->getProfitAmount($order) / $this->finalPrices[$order->getId()] * 100;
     }
 
     /**

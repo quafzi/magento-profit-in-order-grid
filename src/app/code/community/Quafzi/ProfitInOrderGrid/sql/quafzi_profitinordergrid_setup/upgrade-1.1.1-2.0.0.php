@@ -20,11 +20,16 @@ $fields = ['cost', 'profit_amount', 'profit_percent'];
 // add new fields for cost and profit
 $tables = [
     $this->getTable('sales_flat_order_item'),
-    $this->getTable('sales_flat_order')
+    $this->getTable('sales_flat_order'),
+    $this->getTable('sales_flat_order_grid')
 ];
 foreach ($tables as $table) {
     foreach ($fields as $field) {
-        $installer->run("ALTER TABLE $orderItemTable ADD `$field` $decimal NULL;");
+        try {
+            $installer->run("ALTER TABLE $table ADD `$field` $decimal(12,4) NULL;");
+        } catch (Exception $e) {
+            // Column seems to exist already
+        }
     }
 }
 

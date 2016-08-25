@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Add profit columns to order grid
+ *
+ * @category  Mage_Sales
+ * @package   Quafzi_ProfitInOrderGrid
+ * @author    Thomas Birke <magento@netextreme.de>
+ * @copyright 2016 Thomas Birke
+ * @license   http://opensource.org/licenses/osl-3.0.php OSL 3.0
+ * @link      https://github.com/quafzi/magento-profit-in-order-grid
+ */
+-->
+<layout>
+    <quafzi_profitinordergrid_add_profit_columns>
+        <reference name="sales_order.grid">
+            <action method="addColumnAfter" translate="arguments.header" module="quafzi_profitinordergrid">
+                <columnId>cost</columnId>
+                <arguments>
+                    <header>Cost</header>
+                    <index>cost</index>
+                    <filter_index>cost</filter_index>
+                    <type>currency</type>
+                    <currency>order_currency_code</currency>
+                </arguments>
+                <after>grand_total</after>
+            </action>
+            <action method="addColumnAfter" translate="arguments.header" module="quafzi_profitinordergrid">
+                <columnId>profit_amount</columnId>
+                <arguments>
+                    <header>Margin</header>
+                    <index>profit_amount</index>
+                    <filter_index>profit_amount</filter_index>
+                    <type>currency</type>
+                    <currency>order_currency_code</currency>
+                </arguments>
+                <after>cost</after>
+            </action>
+            <action method="addColumnAfter" translate="arguments.header" module="quafzi_profitinordergrid">
+                <columnId>profit_percent</columnId>
+                <arguments>
+                    <header>Markdown Margin</header>
+                    <index>profit_percent</index>
+                    <filter_index>profit_percent</filter_index>
+                    <type>number</type>
+                    <renderer>quafzi_profitinordergrid/grid_column_renderer_percent</renderer>
+                </arguments>
+                <after>profit_amount</after>
+            </action>
+        </reference>
+    </quafzi_profitinordergrid_add_profit_columns>
+    <adminhtml_sales_order_grid>
+        <!-- apply layout handle defined above -->
+        <update handle="quafzi_profitinordergrid_add_profit_columns" />
+    </adminhtml_sales_order_grid>
+    <adminhtml_sales_order_index>
+        <!-- apply layout handle defined above -->
+        <update handle="quafzi_profitinordergrid_add_profit_columns" />
+    </adminhtml_sales_order_index>
+</layout>

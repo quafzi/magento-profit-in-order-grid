@@ -24,6 +24,18 @@
 class Quafzi_ProfitInOrderGrid_Helper_Order_Item
 {
     /**
+     * Get cost for an order item
+     *
+     * @param Mage_Sales_Model_Order_Item $item Order item
+     *
+     * @return float
+     */
+    public function getCost(Mage_Sales_Model_Order_Item $item)
+    {
+        return $item->getQtyOrdered() * $item->getProduct()->getCost();
+    }
+
+    /**
      * Get profit amount for an order item
      *
      * @param Mage_Sales_Model_Order_Item $item Order item
@@ -32,7 +44,8 @@ class Quafzi_ProfitInOrderGrid_Helper_Order_Item
      */
     public function getProfitAmount(Mage_Sales_Model_Order_Item $item)
     {
-        return $item->getQtyOrdered() * ($item->getPrice() - $item->getCost())
+        return $item->getQtyOrdered() * $item->getPrice()
+            - $item->getCost()
             - $item->getDiscountAmount();
     }
 
@@ -47,6 +60,10 @@ class Quafzi_ProfitInOrderGrid_Helper_Order_Item
     {
         $qty = $item->getQtyOrdered();
         $finalPrice = $qty * $item->getPrice() - $item->getDiscountAmount();
-        return $this->getProfitAmount($item) / $finalPrice;
+        if ($finalPrice < 0.01) {
+            return 0;
+        }
+        $profit = $this->getProfitAmount($item) / $finalPrice * 100;
+        return $profit;
     }
 }
