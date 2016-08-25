@@ -58,4 +58,37 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
             $helper->getProfitAmount($item)
         );
     }
+
+    /**
+     * Test profit percentage calculation for simple products
+     *
+     * @return void
+     */
+    public function testGetProfitPercentageOfSimpleProductItem()
+    {
+        $helper = new Quafzi_ProfitInOrderGrid_Helper_Order_Item();
+
+        // prepare an order item
+        $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')
+            ->setMethods(
+                ['getCost', 'getDiscountAmount', 'getPrice', 'getQtyOrdered']
+            )->getMock();
+        $item->expects($this->any())
+            ->method('getCost')
+            ->will($this->returnValue(14.83));
+        $item->expects($this->any())
+            ->method('getPrice')
+            ->will($this->returnValue(19.99));
+        $item->expects($this->any())
+            ->method('getDiscountAmount')
+            ->will($this->returnValue(1.00));
+        $item->expects($this->any())
+            ->method('getQtyOrdered')
+            ->will($this->returnValue(2));
+
+        $this->assertEquals(
+            (2 * (19.99 - 14.83) - 1.00)/(19.99 * 2 - 1.00),
+            $helper->getProfitPercentage($item)
+        );
+    }
 }

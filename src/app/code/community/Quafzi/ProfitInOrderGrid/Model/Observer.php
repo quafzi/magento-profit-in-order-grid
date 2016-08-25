@@ -37,9 +37,9 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
         if (!$item->getCost()) {
             $item->setCost($item->getProduct()->getCost());
         }
-        $item->setProfitAmount(
-            Mage::helper('quafzi_profitinordergrid/order_item')->getProfitAmount($item)
-        );
+        $helper = Mage::helper('quafzi_profitinordergrid/order_item');
+        $item->setProfitAmount($helper->getProfitAmount($item))
+            ->setProfitPercent($helper->getProfitPercentage($item));
     }
 
     /**
@@ -52,14 +52,10 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
     public function updateOrderCostAndProfit(Varien_Event_Observer $observer)
     {
         $order = $observer->getEvent()->getModel();
-        $helper = Mage::helper('quafzi_profitinordergrid');
-        $cost = 0;
-        $profit = 0;
-        foreach ($order->getItemsCollection() as $item) {
-            $cost += $item->getCost() * $item->getQtyOrdered();
-            $profit += $item->getCost() * $item->getQtyOrdered();
-        }
-
+        $helper = Mage::helper('quafzi_profitinordergrid/order');
+        $order->setCost($helper->getCost($order))
+            ->setProfitAmount($helper->getProfitAmount($order))
+            ->setProfitPercent($helper->getProfitPercentage($order));
     }
 
     /**
@@ -151,7 +147,7 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
      */
     protected function _addColumns($grid, $after='grand_total')
     {
-        $columns = ['cost', 'profit_amount'];
+        $columns = ['cost', 'profit_amount', 'profit_percent'];
         $helper = Mage::helper('quafzi_profitinordergrid');
         foreach ($columns as $column) {
             $columnData = [

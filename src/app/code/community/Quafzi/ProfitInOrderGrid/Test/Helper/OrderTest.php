@@ -39,8 +39,14 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
         $items = [];
         $costs = [123, 0, 5, -12.3];
         foreach ($costs as $itemCost) {
-            $item = $this->getMockBuilder('Mage_Sales_Model_Order')
-                ->setMethods(['getProfitAmount', 'getCost'])->getMock();
+            $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')->setMethods(
+                [
+                    'getProfitAmount',
+                    'getCost',
+                    'getPrice',
+                    'getDiscountAmount'
+                ]
+            )->getMock();
             $item->expects($this->any())
                 ->method('getCost')
                 ->will($this->returnValue($itemCost));
@@ -74,8 +80,14 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
         $items = [];
         $profits = [123, 0, 5, -12.3];
         foreach ($profits as $itemProfit) {
-            $item = $this->getMockBuilder('Mage_Sales_Model_Order')
-                ->setMethods(['getProfitAmount', 'getCost'])->getMock();
+            $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')->setMethods(
+                [
+                    'getProfitAmount',
+                    'getCost',
+                    'getPrice',
+                    'getDiscountAmount'
+                ]
+            )->getMock();
             $item->expects($this->any())
                 ->method('getCost')
                 ->will($this->returnValue($itemProfit*3));
@@ -94,5 +106,55 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
             ->will($this->returnValue($items));
 
         $this->assertEquals(array_sum($profits), $helper->getProfitAmount($order));
+    }
+
+    /**
+     * Test profit percentage calculation for simple products
+     *
+     * @return void
+     */
+    public function testGetProfitPercentageOfOrder()
+    {
+        $helper = new Quafzi_ProfitInOrderGrid_Helper_Order();
+
+        // prepare an order
+        $items = [];
+        $profits = [523 => 123, 231 => 0, 8 => 5, 20 => -12.3];
+        foreach ($profits as $itemPrice => $itemProfit) {
+            $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')->setMethods(
+                [
+                    'getProfitAmount',
+                    'getCost',
+                    'getPrice',
+                    'getDiscountAmount'
+                ]
+            )->getMock();
+            $item->expects($this->any())
+                ->method('getCost')
+                ->will($this->returnValue($itemPrice - $itemProfit + 1));
+            $item->expects($this->any())
+                ->method('getPrice')
+                ->will($this->returnValue($itemPrice));
+            $item->expects($this->any())
+                ->method('getDiscountAmount')
+                ->will($this->returnValue(1));
+            $item->expects($this->any())
+                ->method('getProfitAmount')
+                ->will($this->returnValue($itemProfit));
+            $items[] = $item;
+        }
+        $order = $this->getMockBuilder('Mage_Sales_Model_Order')
+            ->setMethods(['getId', 'getItemsCollection'])->getMock();
+        $order->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue(23890));
+        $order->expects($this->any())
+            ->method('getItemsCollection')
+            ->will($this->returnValue($items));
+
+        $this->assertEquals(
+            array_sum($profits)/(array_sum(array_keys($profits)) - count($profits)),
+            $helper->getProfitPercentage($order)
+        );
     }
 }

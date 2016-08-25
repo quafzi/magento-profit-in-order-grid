@@ -24,6 +24,7 @@
 class Quafzi_ProfitInOrderGrid_Helper_Order
 {
     protected $costs = [];
+    protected $finalPrices = [];
     protected $profitAmounts = [];
 
     /**
@@ -42,7 +43,7 @@ class Quafzi_ProfitInOrderGrid_Helper_Order
     }
 
     /**
-     * Get profit for an order
+     * Get profit amount for an order
      *
      * @param Mage_Sales_Model_Order $order Order
      *
@@ -57,6 +58,23 @@ class Quafzi_ProfitInOrderGrid_Helper_Order
     }
 
     /**
+     * Get profit percentage for an order
+     *
+     * @param Mage_Sales_Model_Order $order Order
+     *
+     * @return float
+     */
+    public function getProfitPercentage(Mage_Sales_Model_Order $order)
+    {
+        if (!isset($this->profitAmounts[$order->getId()])
+            || !isset($this->finalPrices[$order->getId()])
+        ) {
+            $this->collectCostAndProfit($order);
+        }
+        return $this->getProfitAmount($order) / $this->finalPrices[$order->getId()];
+    }
+
+    /**
      * Collect cost profit for an order
      *
      * @param Mage_Sales_Model_Order $order Order
@@ -66,12 +84,15 @@ class Quafzi_ProfitInOrderGrid_Helper_Order
     protected function collectCostAndProfit(Mage_Sales_Model_Order $order)
     {
         $cost = 0;
+        $finalPrice = 0;
         $profitAmount = 0;
         foreach ($order->getItemsCollection() as $item) {
             $cost += $item->getCost();
+            $finalPrice += $item->getPrice() - $item->getDiscountAmount();
             $profitAmount += $item->getProfitAmount();
         }
         $this->costs[$order->getId()] = $cost;
+        $this->finalPrices[$order->getId()] = $finalPrice;
         $this->profitAmounts[$order->getId()] = $profitAmount;
     }
 }

@@ -35,4 +35,18 @@ class Quafzi_ProfitInOrderGrid_Helper_Order_Item
         return $item->getQtyOrdered() * ($item->getPrice() - $item->getCost())
             - $item->getDiscountAmount();
     }
+
+    /**
+     * Get profit percentage for an order item
+     *
+     * @param Mage_Sales_Model_Order_Item $item Order item
+     *
+     * @return float
+     */
+    public function getProfitPercentage(Mage_Sales_Model_Order_Item $item)
+    {
+        $qty = $item->getQtyOrdered();
+        $finalPrice = $qty * $item->getPrice() - $item->getDiscountAmount();
+        return $this->getProfitAmount($item) / $finalPrice;
+    }
 }
