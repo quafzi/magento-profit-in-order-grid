@@ -153,7 +153,7 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
             ->will($this->returnValue($items));
 
         $this->assertEquals(
-            array_sum($profits)/(array_sum(array_keys($profits)) - count($profits)),
+            100 * array_sum($profits)/(array_sum(array_keys($profits)) - count($profits)),
             $helper->getProfitPercentage($order)
         );
     }

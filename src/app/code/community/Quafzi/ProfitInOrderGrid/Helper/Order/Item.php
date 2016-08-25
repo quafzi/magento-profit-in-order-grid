@@ -32,7 +32,14 @@ class Quafzi_ProfitInOrderGrid_Helper_Order_Item
      */
     public function getCost(Mage_Sales_Model_Order_Item $item)
     {
-        return $item->getQtyOrdered() * $item->getProduct()->getCost();
+        $cost = $item->getProduct()->getCost();
+        if (is_null($cost)) {
+            $cost = 0;
+            foreach ($item->getChildrenItems() as $child) {
+                $cost += $child->getProduct()->getCost();
+            }
+        }
+        return $item->getQtyOrdered() * $cost;
     }
 
     /**
@@ -45,7 +52,7 @@ class Quafzi_ProfitInOrderGrid_Helper_Order_Item
     public function getProfitAmount(Mage_Sales_Model_Order_Item $item)
     {
         return $item->getQtyOrdered() * $item->getPrice()
-            - $item->getCost()
+            - $this->getCost($item)
             - $item->getDiscountAmount();
     }
 

@@ -36,13 +36,18 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
         $helper = new Quafzi_ProfitInOrderGrid_Helper_Order_Item();
 
         // prepare an order item
-        $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')
-            ->setMethods(
-                ['getCost', 'getDiscountAmount', 'getPrice', 'getQtyOrdered']
-            )->getMock();
-        $item->expects($this->any())
+        $product = $this->getMockBuilder('Mage_Catalog_Model_Product')
+            ->setMethods(['getCost'])->getMock();
+        $product->expects($this->any())
             ->method('getCost')
             ->will($this->returnValue(14.83));
+        $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')
+            ->setMethods(
+                ['getProduct', 'getDiscountAmount', 'getPrice', 'getQtyOrdered']
+            )->getMock();
+        $item->expects($this->any())
+            ->method('getProduct')
+            ->will($this->returnValue($product));
         $item->expects($this->any())
             ->method('getPrice')
             ->will($this->returnValue(19.99));
@@ -69,13 +74,18 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
         $helper = new Quafzi_ProfitInOrderGrid_Helper_Order_Item();
 
         // prepare an order item
-        $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')
-            ->setMethods(
-                ['getCost', 'getDiscountAmount', 'getPrice', 'getQtyOrdered']
-            )->getMock();
-        $item->expects($this->any())
+        $product = $this->getMockBuilder('Mage_Catalog_Model_Product')
+            ->setMethods(['getCost'])->getMock();
+        $product->expects($this->any())
             ->method('getCost')
             ->will($this->returnValue(14.83));
+        $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')
+            ->setMethods(
+                ['getProduct', 'getDiscountAmount', 'getPrice', 'getQtyOrdered']
+            )->getMock();
+        $item->expects($this->any())
+            ->method('getProduct')
+            ->will($this->returnValue($product));
         $item->expects($this->any())
             ->method('getPrice')
             ->will($this->returnValue(19.99));
@@ -87,7 +97,7 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
             ->will($this->returnValue(2));
 
         $this->assertEquals(
-            (2 * (19.99 - 14.83) - 1.00)/(19.99 * 2 - 1.00),
+            100 * (2 * (19.99 - 14.83) - 1.00)/(19.99 * 2 - 1.00),
             $helper->getProfitPercentage($item)
         );
     }
