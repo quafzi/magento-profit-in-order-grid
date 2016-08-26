@@ -56,6 +56,7 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
             ->setMethods(
                 [
                     'getCost',
+                    'getCustomCost',
                     'getDiscountAmount',
                     'getPrice',
                     'getProduct',
@@ -119,6 +120,7 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
             ->setMethods(
                 [
                     'getCost',
+                    'getCustomCost',
                     'getDiscountAmount',
                     'getPrice',
                     'getProduct',

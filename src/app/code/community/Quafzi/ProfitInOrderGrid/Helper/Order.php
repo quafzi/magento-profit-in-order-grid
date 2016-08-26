@@ -102,7 +102,7 @@ class Quafzi_ProfitInOrderGrid_Helper_Order
         $profitAmount = 0;
         $items = $order->getItemsCollection();
         foreach ($this->getItem($items) as $item) {
-            $cost += $item->getCost();
+            $cost += $item->getCustomCost() ?: $item->getCost();
             $finalPrice += $item->getQtyOrdered() * $item->getPrice() - $item->getDiscountAmount();
             $profitAmount += $item->getProfitAmount();
         }

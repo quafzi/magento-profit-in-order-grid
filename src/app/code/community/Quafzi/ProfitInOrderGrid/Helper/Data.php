@@ -20,24 +20,5 @@
  */
 class Quafzi_ProfitInOrderGrid_Helper_Data extends Mage_Core_Helper_Data
 {
-    public function getItemProfit(Mage_Sales_Model_Order_Item $item)
-    {
-        $out = '<table class="qty-table" cellspacing="0">';
-        foreach (['cost', 'profit_amount', 'profit_percent'] as $field) {
-            $value = $item->getData($field);
-            $profitStyle = ((0 < $value) ? '' : 'color:red;') . 'font-weight:bold';
-            $value = 'profit_percent' !== $field
-                ? Mage::helper('core')->formatPrice($value, false)
-                : Mage::app()->getStore()->getCurrentCurrency()->formatTxt(
-                        $value,
-                        ['display' => Zend_Currency::NO_SYMBOL]
-                    ) . '&nbsp;%';
-            $out .= '<tr><td>' . $this->__($field) . '</td>'
-                . '<td style="' . $profitStyle . '">'
-                . $value
-                . '</td></tr>';
-        }
-        $out .= '</table>';
-        return $out;
-    }
+    // this file exists for translation purposes, inherited from Mage_Core_Helper_Data
 }

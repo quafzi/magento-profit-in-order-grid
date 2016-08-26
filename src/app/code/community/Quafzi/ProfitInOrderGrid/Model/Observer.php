@@ -107,13 +107,17 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
     protected function _insertItemGridProfitColumn($transport, $item)
     {
         $html = $transport->getHtml();
-        $profit = Mage::helper('quafzi_profitinordergrid')->getItemProfit($item);
+        $profitOutput = Mage::getSingleton('core/layout')->createBlock(
+            'quafzi_profitinordergrid/sales_order_item_profit',
+            'order_item_profit_column',
+            ['template' => 'quafzi/profitinordergrid/sales/order/item/profit.phtml']
+        )->setItem($item)->toHtml();
         $html = str_replace(
             '<td class="a-right last">',
             '<td class="a-right"><!-- profit --></td><td class="a-right last">',
             $html
         );
-        $transport->setHtml(preg_replace('/<!-- profit -->/', $profit, $html, 1));
+        $transport->setHtml(preg_replace('/<!-- profit -->/', $profitOutput, $html, 1));
         $this->_renderedItems[] = $item->getId();
     }
 }
