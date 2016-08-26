@@ -32,8 +32,6 @@
                 </connection>
             </quafzi_profitinordergrid_setup>
         </resources>
-    </global>
-    <adminhtml>
         <events>
             <sales_order_item_save_before>
                 <observers>
@@ -53,6 +51,10 @@
                     </quafzi_profitinordergrid_add_profit_to_order>
                 </observers>
             </sales_order_save_before>
+        </events>
+    </global>
+    <adminhtml>
+        <events>
             <core_block_abstract_to_html_after>
                 <observers>
                     <!-- Inject cost and profit into order items in adminhtml order detail view -->

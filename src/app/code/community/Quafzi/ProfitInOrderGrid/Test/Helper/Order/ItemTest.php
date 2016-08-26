@@ -41,13 +41,35 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
         $product->expects($this->any())
             ->method('getCost')
             ->will($this->returnValue(14.83));
+        $productResource = $this->getMockBuilder('Mage_Catalog_Model_Resource_Product')
+            ->setMethods(['getAttributeRawValue'])->getMock();
+        $productResource->expects($this->at(0))
+            ->method('getAttributeRawValue')
+            ->with($this->equalTo(90234), $this->equalTo('cost'), $this->equalTo(32))
+            ->will($this->returnValue(null));
+        $productResource->expects($this->at(1))
+            ->method('getAttributeRawValue')
+            ->with($this->equalTo(90234), $this->equalTo('cost'), $this->equalTo(0))
+            ->will($this->returnValue(null));
+        $helper->setProductResourceModel($productResource);
         $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')
             ->setMethods(
-                ['getProduct', 'getDiscountAmount', 'getPrice', 'getQtyOrdered']
+                [
+                    'getCost',
+                    'getDiscountAmount',
+                    'getPrice',
+                    'getProduct',
+                    'getProductId',
+                    'getQtyOrdered',
+                    'getStoreId'
+                ]
             )->getMock();
         $item->expects($this->any())
             ->method('getProduct')
             ->will($this->returnValue($product));
+        $item->expects($this->any())
+            ->method('getProductId')
+            ->will($this->returnValue(90234));
         $item->expects($this->any())
             ->method('getPrice')
             ->will($this->returnValue(19.99));
@@ -57,6 +79,9 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
         $item->expects($this->any())
             ->method('getQtyOrdered')
             ->will($this->returnValue(2));
+        $item->expects($this->any())
+            ->method('getStoreId')
+            ->will($this->returnValue(32));
 
         $this->assertEquals(
             2 * (19.99 - 14.83) - 1.00,
@@ -79,13 +104,35 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
         $product->expects($this->any())
             ->method('getCost')
             ->will($this->returnValue(14.83));
+        $productResource = $this->getMockBuilder('Mage_Catalog_Model_Resource_Product')
+            ->setMethods(['getAttributeRawValue'])->getMock();
+        $productResource->expects($this->at(0))
+            ->method('getAttributeRawValue')
+            ->with($this->equalTo(834), $this->equalTo('cost'), $this->equalTo(8))
+            ->will($this->returnValue(null));
+        $productResource->expects($this->at(1))
+            ->method('getAttributeRawValue')
+            ->with($this->equalTo(834), $this->equalTo('cost'), $this->equalTo(0))
+            ->will($this->returnValue(null));
+        $helper->setProductResourceModel($productResource);
         $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')
             ->setMethods(
-                ['getProduct', 'getDiscountAmount', 'getPrice', 'getQtyOrdered']
+                [
+                    'getCost',
+                    'getDiscountAmount',
+                    'getPrice',
+                    'getProduct',
+                    'getProductId',
+                    'getQtyOrdered',
+                    'getStoreId'
+                ]
             )->getMock();
         $item->expects($this->any())
             ->method('getProduct')
             ->will($this->returnValue($product));
+        $item->expects($this->any())
+            ->method('getProductId')
+            ->will($this->returnValue(834));
         $item->expects($this->any())
             ->method('getPrice')
             ->will($this->returnValue(19.99));
@@ -95,6 +142,9 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order_Item extends TestCase
         $item->expects($this->any())
             ->method('getQtyOrdered')
             ->will($this->returnValue(2));
+        $item->expects($this->any())
+            ->method('getStoreId')
+            ->will($this->returnValue(8));
 
         $this->assertEquals(
             100 * (2 * (19.99 - 14.83) - 1.00)/(19.99 * 2 - 1.00),

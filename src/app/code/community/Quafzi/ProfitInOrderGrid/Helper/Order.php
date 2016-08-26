@@ -66,12 +66,26 @@ class Quafzi_ProfitInOrderGrid_Helper_Order
      */
     public function getProfitPercentage(Mage_Sales_Model_Order $order)
     {
-        if (!isset($this->profitAmounts[$order->getId()])
-            || !isset($this->finalPrices[$order->getId()])
-        ) {
-            $this->collectCostAndProfit($order);
-        }
         return $this->getProfitAmount($order) / $this->finalPrices[$order->getId()] * 100;
+    }
+
+    /**
+     * Get items generator
+     *
+     * @param Mage_Sales_Model_Resource_Order_Item_Collection|array $items Order items collection
+     */
+    protected function getItem($items)
+    {
+        if (is_array($items)) {
+            foreach ($items as $item) {
+                yield $item;
+            }
+            return;
+        }
+        $ids = $items->getAllIds();
+        foreach ($ids as $id) {
+            yield $items->getItemById($id);
+        }
     }
 
     /**
@@ -86,11 +100,13 @@ class Quafzi_ProfitInOrderGrid_Helper_Order
         $cost = 0;
         $finalPrice = 0;
         $profitAmount = 0;
-        foreach ($order->getItemsCollection() as $item) {
+        $items = $order->getItemsCollection();
+        foreach ($this->getItem($items) as $item) {
             $cost += $item->getCost();
-            $finalPrice += $item->getPrice() - $item->getDiscountAmount();
+            $finalPrice += $item->getQtyOrdered() * $item->getPrice() - $item->getDiscountAmount();
             $profitAmount += $item->getProfitAmount();
         }
+        unset($items);
         $this->costs[$order->getId()] = $cost;
         $this->finalPrices[$order->getId()] = $finalPrice;
         $this->profitAmounts[$order->getId()] = $profitAmount;

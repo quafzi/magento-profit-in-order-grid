@@ -41,10 +41,11 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
         foreach ($costs as $itemCost) {
             $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')->setMethods(
                 [
-                    'getProfitAmount',
                     'getCost',
+                    'getDiscountAmount',
                     'getPrice',
-                    'getDiscountAmount'
+                    'getProfitAmount',
+                    'getQtyOrdered',
                 ]
             )->getMock();
             $item->expects($this->any())
@@ -82,10 +83,11 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
         foreach ($profits as $itemProfit) {
             $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')->setMethods(
                 [
-                    'getProfitAmount',
                     'getCost',
+                    'getDiscountAmount',
                     'getPrice',
-                    'getDiscountAmount'
+                    'getProfitAmount',
+                    'getQtyOrdered'
                 ]
             )->getMock();
             $item->expects($this->any())
@@ -123,10 +125,11 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
         foreach ($profits as $itemPrice => $itemProfit) {
             $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')->setMethods(
                 [
-                    'getProfitAmount',
                     'getCost',
+                    'getDiscountAmount',
                     'getPrice',
-                    'getDiscountAmount'
+                    'getProfitAmount',
+                    'getQtyOrdered'
                 ]
             )->getMock();
             $item->expects($this->any())
@@ -135,6 +138,9 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
             $item->expects($this->any())
                 ->method('getPrice')
                 ->will($this->returnValue($itemPrice));
+            $item->expects($this->any())
+                ->method('getQtyOrdered')
+                ->will($this->returnValue(1));
             $item->expects($this->any())
                 ->method('getDiscountAmount')
                 ->will($this->returnValue(1));

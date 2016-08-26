@@ -33,10 +33,7 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
      */
     public function updateOrderItemCostAndProfit(Varien_Event_Observer $observer)
     {
-        $item = $observer->getEvent()->getModel();
-        if (!$item->getCost()) {
-            $item->setCost($item->getProduct()->getCost());
-        }
+        $item = $observer->getEvent()->getItem();
         $helper = Mage::helper('quafzi_profitinordergrid/order_item');
         $item->setCost($helper->getCost($item))
             ->setProfitAmount($helper->getProfitAmount($item))
@@ -52,7 +49,7 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
      */
     public function updateOrderCostAndProfit(Varien_Event_Observer $observer)
     {
-        $order = $observer->getEvent()->getModel();
+        $order = $observer->getEvent()->getOrder();
         $helper = Mage::helper('quafzi_profitinordergrid/order');
         $order->setCost($helper->getCost($order))
             ->setProfitAmount($helper->getProfitAmount($order))
