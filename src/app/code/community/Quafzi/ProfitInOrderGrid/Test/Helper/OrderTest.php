@@ -42,14 +42,16 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
             $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')->setMethods(
                 [
                     'getCost',
+                    'getCustomCost',
                     'getDiscountAmount',
+                    'getParentItemId',
                     'getPrice',
                     'getProfitAmount',
                     'getQtyOrdered',
                 ]
             )->getMock();
             $item->expects($this->any())
-                ->method('getCost')
+                ->method('getCustomCost')
                 ->will($this->returnValue($itemCost));
             $item->expects($this->any())
                 ->method('getProfitAmount')
@@ -84,14 +86,16 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
             $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')->setMethods(
                 [
                     'getCost',
+                    'getCustomCost',
                     'getDiscountAmount',
+                    'getParentItemId',
                     'getPrice',
                     'getProfitAmount',
                     'getQtyOrdered'
                 ]
             )->getMock();
             $item->expects($this->any())
-                ->method('getCost')
+                ->method('getCustomCost')
                 ->will($this->returnValue($itemProfit*3));
             $item->expects($this->any())
                 ->method('getProfitAmount')
@@ -125,15 +129,16 @@ class Quafzi_ProfitInOrderGrid_Test_Helper_Order extends TestCase
         foreach ($profits as $itemPrice => $itemProfit) {
             $item = $this->getMockBuilder('Mage_Sales_Model_Order_Item')->setMethods(
                 [
-                    'getCost',
+                    'getCustomCost',
                     'getDiscountAmount',
+                    'getParentItemId',
                     'getPrice',
                     'getProfitAmount',
                     'getQtyOrdered'
                 ]
             )->getMock();
             $item->expects($this->any())
-                ->method('getCost')
+                ->method('getCustomCost')
                 ->will($this->returnValue($itemPrice - $itemProfit + 1));
             $item->expects($this->any())
                 ->method('getPrice')

@@ -1,6 +1,6 @@
 <?php
 /**
- * Observer
+ * Percent Renderer
  *
  * PHP version ^5.6
  *

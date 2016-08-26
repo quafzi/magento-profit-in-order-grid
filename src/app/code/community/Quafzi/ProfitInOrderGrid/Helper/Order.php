@@ -70,25 +70,6 @@ class Quafzi_ProfitInOrderGrid_Helper_Order
     }
 
     /**
-     * Get items generator
-     *
-     * @param Mage_Sales_Model_Resource_Order_Item_Collection|array $items Order items collection
-     */
-    protected function getItem($items)
-    {
-        if (is_array($items)) {
-            foreach ($items as $item) {
-                yield $item;
-            }
-            return;
-        }
-        $ids = $items->getAllIds();
-        foreach ($ids as $id) {
-            yield $items->getItemById($id);
-        }
-    }
-
-    /**
      * Collect cost profit for an order
      *
      * @param Mage_Sales_Model_Order $order Order
@@ -101,8 +82,12 @@ class Quafzi_ProfitInOrderGrid_Helper_Order
         $finalPrice = 0;
         $profitAmount = 0;
         $items = $order->getItemsCollection();
-        foreach ($this->getItem($items) as $item) {
-            $cost += $item->getCost();
+        foreach ($items as $item) {
+            $itemCost = $item->getCustomCost() ?: $item->getCost();
+            if ($item->getParentItemId() && $item->getParentItem()->getCustomCost()) {
+                continue;
+            }
+            $cost += $itemCost;
             $finalPrice += $item->getQtyOrdered() * $item->getPrice() - $item->getDiscountAmount();
             $profitAmount += $item->getProfitAmount();
         }

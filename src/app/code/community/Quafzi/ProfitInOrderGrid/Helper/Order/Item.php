@@ -75,6 +75,18 @@ class Quafzi_ProfitInOrderGrid_Helper_Order_Item
         return $cost;
     }
 
+    public function getCustomCost(Mage_Sales_Model_Order_Item $item)
+    {
+        if ($item->getParentItemId()) {
+            $parentItem = $item->getParentItem();
+            if ($parentItem->getCustomCost()) {
+                return $parentItem->getCustomCost();
+            }
+            return $this->getCost($item);
+        }
+        return $item->getCustomCost() ?: $this->getCost($item);
+    }
+
     /**
      * Get profit amount for an order item
      *
@@ -85,7 +97,7 @@ class Quafzi_ProfitInOrderGrid_Helper_Order_Item
     public function getProfitAmount(Mage_Sales_Model_Order_Item $item)
     {
         return $item->getQtyOrdered() * $item->getPrice()
-            - $this->getCost($item)
+            - $this->getCustomCost($item)
             - $item->getDiscountAmount();
     }
 

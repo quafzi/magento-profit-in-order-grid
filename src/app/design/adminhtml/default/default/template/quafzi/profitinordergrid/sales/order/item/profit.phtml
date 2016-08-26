@@ -1,0 +1,37 @@
+<?php
+/**
+ * Profit column of items grid in adminhtml order view
+ *
+ * PHP version ^5.6
+ *
+ * @category  Mage_Sales
+ * @package   Quafzi_ProfitInOrderGrid
+ * @author    Thomas Birke <magento@netextreme.de>
+ * @copyright 2015-2016 Thomas Birke
+ * @license   http://opensource.org/licenses/osl-3.0.php OSL 3.0
+ * @link      https://github.com/quafzi/magento-profit-in-order-grid
+ *
+ * @var $this Quafzi_ProfitInOrderGrid_Block_Sales_Order_Item_Profit
+ */
+?>
+<table class="qty-table" cellspacing="0" id="cost_table_<?php echo $this->getId(); ?>">
+    <tr>
+        <td><?php echo $this->__('Custom Cost'); ?></td>
+        <td><input type="numeric" name="custom_cost" id="custom_cost_<?php echo $this->getId(); ?>" onchange="
+            new Ajax.Updater(
+                'cost_table_<?php echo $this->getId(); ?>',
+                '<?php echo $this->getUpdateCostUrl(); ?>',
+                { method: 'post', parameters: { item_id: <?php echo $this->getId(); ?>, value: this.value } }
+            );
+        " value="<?php echo $this->getValue('custom_cost') ? number_format($this->getValue('custom_cost'), 2) : ''; ?>" style="width: 70px; height: 12px; text-align: right" /></td>
+    </tr>
+<?php foreach (['cost', 'profit_amount', 'profit_percent'] as $field): ?>
+    <?php $profitStyle = ((0 < $this->getValue($field)) ? '' : 'color:red;') . 'font-weight:bold'; ?>
+    <tr>
+        <td><?php echo $this->__($field); ?></td>
+        <td style="<?php echo $profitStyle; ?>">
+            <?php echo $this->getFormattedValue($field); ?>
+        </td>
+    </tr>
+<?php endforeach; ?>
+</table>
