@@ -35,6 +35,8 @@ class Quafzi_ProfitInOrderGrid_Adminhtml_ProfitinordergridController
             }
             $item->setCustomCost($value)->save();
             $item->getOrder()->setCost(null)->save();
+            $item = Mage::getModel('sales/order_item')->load($item->getId());
+
             echo Mage::getSingleton('core/layout')->createBlock(
                 'quafzi_profitinordergrid/sales_order_item_profit',
                 'order_item_profit_column',
