@@ -33,11 +33,15 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
      */
     public function updateOrderItemCostAndProfit(Varien_Event_Observer $observer)
     {
-        $item = $observer->getEvent()->getItem();
-        $helper = Mage::helper('quafzi_profitinordergrid/order_item');
-        $item->setCost($helper->getCost($item))
-            ->setProfitAmount($helper->getProfitAmount($item))
-            ->setProfitPercent($helper->getProfitPercentage($item));
+        try {
+            $item = $observer->getEvent()->getItem();
+            $helper = Mage::helper('quafzi_profitinordergrid/order_item');
+            $item->setCost($helper->getCost($item))
+                ->setProfitAmount($helper->getProfitAmount($item))
+                ->setProfitPercent($helper->getProfitPercentage($item));
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
     }
 
     /**
@@ -49,11 +53,15 @@ class Quafzi_ProfitInOrderGrid_Model_Observer
      */
     public function updateOrderCostAndProfit(Varien_Event_Observer $observer)
     {
-        $order = $observer->getEvent()->getOrder();
-        $helper = Mage::helper('quafzi_profitinordergrid/order');
-        $order->setCost($helper->getCost($order))
-            ->setProfitAmount($helper->getProfitAmount($order))
-            ->setProfitPercent($helper->getProfitPercentage($order));
+        try {
+            $order = $observer->getEvent()->getOrder();
+            $helper = Mage::helper('quafzi_profitinordergrid/order');
+            $order->setCost($helper->getCost($order))
+                ->setProfitAmount($helper->getProfitAmount($order))
+                ->setProfitPercent($helper->getProfitPercentage($order));
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
     }
 
     /**
