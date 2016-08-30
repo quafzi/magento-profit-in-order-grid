@@ -13,11 +13,16 @@ Facts
 
 Description
 -----------
-This extension shows your profit in order grid.
+This extension adds 3 new columns to your order grid, containing cost, profit
+amount and markdown margin of the order. In order view, the same information are
+shown in the order items grid. In addition, you may specify a custom cost per
+item. Changing that cost results in recalculation of profit.
+
+All values are stored as separate fields in order tables and order item table.
 
 Requirements
 ------------
-- PHP >= 5.2.0
+- PHP >= 5.6.0
 - Mage_Core
 - Maintained cost attribute for every product
 
