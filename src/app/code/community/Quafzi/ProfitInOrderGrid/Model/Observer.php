@@ -24,6 +24,43 @@
 class Quafzi_ProfitInOrderGrid_Model_Observer
 {
     /**
+     * Add profit columns
+     *
+     * @param Varien_Event_Observer $observer Observer
+     *
+     * @return void
+     */
+    public function addColumnsAfterBlockCreate(Varien_Event_Observer $observer) {
+        $block = $observer->getEvent()->getBlock();
+        if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid) {
+            $helper = Mage::helper('quafzi_profitinordergrid');
+            $block->addColumnAfter('cost', [
+                'header' => $helper->__('Cost'),
+                'index' => 'cost',
+                'filter_index' => 'cost',
+                'type' => 'currency',
+                'currency' => 'order_currency_code'
+            ], 'grand_total');
+            $block->addColumnAfter('profit_amount', [
+                'header' => $helper->__('Margin'),
+                'index' => 'profit_amount',
+                'filter_index' => 'profit_amount',
+                'type' => 'currency',
+                'currency' => 'order_currency_code'
+            ], 'cost');
+            $block->addColumnAfter('profit_percent', [
+                'header' => $helper->__('Markdown Margin'),
+                'index' => 'profit_percent',
+                'filter_index' => 'profit_percent',
+                'type' => 'number',
+                'renderer' => 'quafzi_profitinordergrid/grid_column_renderer_percent'
+            ], 'profit_amount');
+            // reinitialize column order
+            $block->sortColumnsByOrder();
+        }
+    }
+
+    /**
      * If item has no cost, we need to add it based on product cost
      * Update item profit
      *
