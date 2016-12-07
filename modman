@@ -1,5 +1,4 @@
 src/app/code/community/Quafzi/ProfitInOrderGrid     app/code/community/Quafzi/ProfitInOrderGrid
 src/app/locale/de_DE/*    app/locale/de_DE/
 src/app/etc/modules/*    app/etc/modules/
-src/app/design/adminhtml/default/default/layout/* app/design/adminhtml/default/default/layout/
 src/app/design/adminhtml/default/default/template/quafzi/* app/design/adminhtml/default/default/template/quafzi/
