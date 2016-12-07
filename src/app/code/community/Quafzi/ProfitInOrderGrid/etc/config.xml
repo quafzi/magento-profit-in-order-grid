@@ -66,6 +66,14 @@
     </admin>
     <adminhtml>
         <events>
+            <core_layout_block_create_after>
+                <observers>
+                    <quafzi_profitinordergrid_adminhtml_block_create_after>
+                        <class>quafzi_profitinordergrid/observer</class>
+                        <method>addColumnsAfterBlockCreate</method>
+                    </quafzi_profitinordergrid_adminhtml_block_create_after>
+                </observers>
+            </core_layout_block_create_after>
             <core_block_abstract_to_html_after>
                 <observers>
                     <!-- Inject cost and profit into order items in adminhtml order detail view -->

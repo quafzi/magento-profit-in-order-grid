@@ -23,7 +23,7 @@
                 '<?php echo $this->getUpdateCostUrl(); ?>',
                 { method: 'post', parameters: { item_id: <?php echo $this->getId(); ?>, value: this.value } }
             );
-        " value="<?php echo $this->getValue('custom_cost') ? number_format($this->getValue('custom_cost'), 2) : ''; ?>" style="width: 70px; height: 12px; text-align: right" /></td>
+        " value="<?php echo $this->getValue('custom_cost') ? round($this->getValue('custom_cost'), 2) : ''; ?>" style="width: 70px; height: 12px; text-align: right" /></td>
     </tr>
 <?php foreach (['cost', 'profit_amount', 'profit_percent'] as $field): ?>
     <?php $profitStyle = ((0 < $this->getValue($field)) ? '' : 'color:red;') . 'font-weight:bold'; ?>
